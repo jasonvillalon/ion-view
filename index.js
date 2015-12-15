@@ -1,4 +1,5 @@
 import React, {PropTypes} from "react"
+import history from "./../history"
 import ReactCSSTransitionGroup from "react-addons-css-transition-group"
 import StaticContainer from "react-static-container"
 
@@ -17,7 +18,7 @@ class RouteCSSTransitionGroup extends React.Component {
 
   componentWillReceiveProps(nextProps, nextContext) {
     if (nextContext.location.pathname !== this.context.location.pathname) {
-      this.setState({ previousPathname: this.context.location.pathname })
+      this.setState({previousPathname: this.context.location.pathname})
     }
   }
 
@@ -39,7 +40,7 @@ class RouteCSSTransitionGroup extends React.Component {
 
   componentDidUpdate() {
     if (this.state.previousPathname) {
-      this.setState({ previousPathname: null })
+      this.setState({previousPathname: null})
     }
   }
 }
@@ -51,9 +52,34 @@ RouteCSSTransitionGroup.contextTypes = {
 
 const IonView = React.createClass({
   mixins: [Layout],
+  getInitialState: function() {
+    return {
+      direction: "right",
+      paths: []
+    }
+  },
+  componentDidMount() {
+    history.listen(this.historyListener)
+  },
+  componentWillUnmount() {
+    history.unlisten(this.historyListener)
+  },
+  historyListener(current) {
+    if (current.action === "PUSH") {
+      this.state.paths.push(current)
+      this.state.direction = "right"
+    } else if (current.action === "POP") {
+      this.state.direction = "left"
+      this.state.paths.splice(this.state.paths.length - 1, 1)
+    }
+    this.setState({
+      paths: this.state.paths,
+      direction: this.state.direction
+    })
+  },
   render() {
     return (
-      <RouteCSSTransitionGroup {...this.layout("row")} {...this.flex()} {...this.fill} component="div" transitionName="moveUp" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
+      <RouteCSSTransitionGroup {...this.layout("row")} {...this.flex()} {...this.fill} component="div" transitionName={this.state.direction} transitionEnterTimeout={500} transitionLeaveTimeout={300}>
         <div className="ionview" {...this.flex()} {...this.fill}>
           {this.props.children}
         </div>
