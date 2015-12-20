@@ -1,49 +1,6 @@
-.ionview
+.ion-view
   background white
-//
-.right-enter
-  transition-duration .3s
-  transition-property transform, opacity
-  transition-timing-function ease-out
-  transform translate3d(100vw,0,0)
-
-.right-enter.right-enter-active
-  transform translate3d(0,0,0)
-
-.right-leave
-  position absolute
-  left 0
-  top 0
-  transition-duration .4s
-  transition-property transform, opacity
-  transition-timing-function ease-out
-  transform translate3d(0,0,0)
-  opacity 1
-
-.right-leave.right-leave-active
-  transform translate3d(-100vw,0,0)
-  opacity 0.5
-
-.left-enter
-  transition-duration .3s
-  transition-property transform, opacity
-  transition-timing-function ease-in
-  transform translate3d(-100vw,0,0)
-  // z-index 10000
-
-.left-enter.left-enter-active
-  transform translate3d(0,0,0)
-
-.left-leave
-  position absolute
-  left 0
-  top 0
-  transition-duration .4s
-  transition-property transform, opacity
-  transition-timing-function ease-in
-  transform translate3d(0,0,0)
-  opacity 1
-
-.left-leave.left-leave-active
-  transform translate3d(100vw,0,0)
-  opacity 0.5
+  &.animating
+    transition-duration 500ms
+    transition-timing-function cubic-bezier(0.36, 0.66, 0.04, 1)
+    transition-property opacity, transform
