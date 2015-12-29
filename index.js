@@ -39,24 +39,37 @@ var PageSlider = {
     }
   },
   slidePage(page, c) {
+    let current
+    console.log(c)
     if (c) {
+      if (c.action === "REPLACE") {
+        return
+      }
+      if (this.state.current.length > 1) {
+        current = this.state.current[this.state.current.length - 1]
+        if (current) {
+          if (c.pathname === current.pathname) {
+            return
+          }
+        }
+      }
       this.state.current.push(c)
     } else if (c == null || c.action==="POP") {
-      this.state.current.pop()
+      if (this.state.current.length > 1) {
+        this.state.current.pop()
+      }
     }
     var history = this.state.history,
       pages = this.state.pages,
       l = history.length,
-      pathname = this.state.current[this.state.current.length - 1].pathname,
       position = "center"
-    console.log(c)
     if (l === 0 && c != null) {
-      history.push(pathname)
+      history.push(c.pathname)
     } else if (c == null || c.action==="POP") {
       history.pop()
       position = "left"
     } else {
-      history.push(pathname)
+      history.push(c.pathname)
       position = "right"
     }
     pages.push(React.cloneElement(page, {position}))
@@ -73,7 +86,7 @@ var PageSlider = {
 }
 
 const IonView = React.createClass({
-  mixins: [Layout, PageSlider],
+  mixins: [PageSlider],
   componentDidMount() {
     history.listen(this.historyListener)
   },
@@ -81,11 +94,13 @@ const IonView = React.createClass({
     history.unlisten(this.historyListener)
   },
   componentWillReceiveProps(nextProps) {
-    console.log("receive")
+    // if (this.props.children !== nextProps.children) {
     this.slidePage(nextProps.children, this.current)
     this.current = null
+    // }
   },
   historyListener(current) {
+    console.log("history")
     if (current.action !== "POP" || this.current === undefined) {
       this.current = current
     }
