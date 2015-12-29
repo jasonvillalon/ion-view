@@ -15,6 +15,12 @@ module.exports = {
         "$layout-breakpoint-lg": "1200px",
         "$layout-gutter-width": "$baseline-grid * 2"
       }
+    },
+    {
+      "Name": "WindowResize",
+      "Description": "Window resize",
+      "Author": "Jason Villalon",
+      "Repository": "git@bitbucket.org:generator-react-component/windowresize.git"
     }
   ]
 };

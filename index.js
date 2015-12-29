@@ -1,67 +1,94 @@
 import React, {PropTypes} from "react"
 import history from "./../history"
-import ReactCSSTransitionGroup from "react-addons-css-transition-group"
 import dependencies from "./dependencies"
+import ReactDOM from "react-dom"
 
-let {Layout} = dependencies
+let {Layout, WindowResize} = dependencies
 
-const IonView = React.createClass({
-  mixins: [Layout],
-  getInitialState: function() {
+var PageSlider = {
+  getInitialState: function () {
     return {
-      direction: "right",
-      paths: [],
-      style: {},
-      animatingCls: "",
-      windowWidth: window.innerWidth
+      history: [],
+      pages: [],
+      animating: false,
+      current: []
     }
   },
-  onResize(dimention) {
-    this.setState({
-      windowWidth: dimention.innerWidth
-    })
+  componentDidUpdate: function() {
+    var skippedCurrentFrame = false,
+      pageEl = ReactDOM.findDOMNode(this).lastChild,
+      pages = this.state.pages,
+      l = pages.length,
+      transitionEndHandler = function() {
+        pageEl.removeEventListener("webkitTransitionEnd", transitionEndHandler)
+        pages.shift()
+        this.setState({pages: pages})
+      }.bind(this),
+      animate = function() {
+        if (!skippedCurrentFrame) {
+          skippedCurrentFrame = true
+          requestAnimationFrame(animate)
+        } else if (l > 0) {
+          pages[l - 1] = React.cloneElement(pages[l - 1], {position: "center transition"})
+          this.setState({pages: pages, animating: false})
+          pageEl.addEventListener("webkitTransitionEnd", transitionEndHandler)
+        }
+      }.bind(this)
+    if (this.state.animating) {
+      requestAnimationFrame(animate)
+    }
   },
+  slidePage(page, c) {
+    if (c) {
+      this.state.current.push(c)
+    } else if (c == null || c.action==="POP") {
+      this.state.current.pop()
+    }
+    var history = this.state.history,
+      pages = this.state.pages,
+      l = history.length,
+      pathname = this.state.current[this.state.current.length - 1].pathname,
+      position = "center"
+    console.log(c)
+    if (l === 0 && c != null) {
+      history.push(pathname)
+    } else if (c == null || c.action==="POP") {
+      history.pop()
+      position = "left"
+    } else {
+      history.push(pathname)
+      position = "right"
+    }
+    pages.push(React.cloneElement(page, {position}))
+    this.setState({history: history, pages: pages, animating: position!=="center", current: this.state.current})
+
+  },
+  render() {
+    return (
+      <div className="pageslider-container">
+        {this.state.pages}
+      </div>
+    )
+  }
+}
+
+const IonView = React.createClass({
+  mixins: [Layout, PageSlider],
   componentDidMount() {
     history.listen(this.historyListener)
   },
   componentWillUnmount() {
     history.unlisten(this.historyListener)
-    console.log("unmounting")
+  },
+  componentWillReceiveProps(nextProps) {
+    console.log("receive")
+    this.slidePage(nextProps.children, this.current)
+    this.current = null
   },
   historyListener(current) {
-    console.log(current)
-    if (current.action === "PUSH") {
-      this.state.paths.push(current)
-      this.state.direction = "right"
-    } else if (current.action === "POP") {
-      this.state.direction = "left"
-      this.state.paths.splice(this.state.paths.length - 1, 1)
+    if (current.action !== "POP" || this.current === undefined) {
+      this.current = current
     }
-    this.setState({
-      paths: this.state.paths
-    })
-    this.setState({
-      paths: this.state.paths,
-      animatingCls: "",
-      style: {
-        transform: `translateX(${((this.state.windowWidth / 2) * (this.state.direction == "right" ? 1 : -1))}px) translateZ(0px)`
-      }
-    })
-    setTimeout(() => {
-      this.setState({
-        animatingCls: " animating",
-        style: {
-          transform: "translateX(0px) translateZ(0px)"
-        }
-      })
-    }, 100)
-  },
-  render() {
-    return (
-      <div className={"ion-view" + this.state.animatingCls} style={this.state.style} {...this.fill} {...this.flex()} {...this.layout("row")}>
-        {this.props.children}
-      </div>
-    )
   }
 })
 
