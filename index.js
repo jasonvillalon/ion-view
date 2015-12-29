@@ -4,8 +4,6 @@ import dependencies from "./dependencies"
 import ReactDOM from "react-dom"
 import _ from "lodash"
 
-let {Layout, WindowResize} = dependencies
-
 var PageSlider = {
   getInitialState: function () {
     return {
