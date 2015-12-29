@@ -2,6 +2,7 @@ import React, {PropTypes} from "react"
 import history from "./../history"
 import dependencies from "./dependencies"
 import ReactDOM from "react-dom"
+import _ from "lodash"
 
 let {Layout, WindowResize} = dependencies
 
@@ -39,14 +40,12 @@ var PageSlider = {
     }
   },
   slidePage(page, c) {
-    let current
-    console.log(c)
     if (c) {
       if (c.action === "REPLACE") {
         return
       }
       if (this.state.current.length > 1) {
-        current = this.state.current[this.state.current.length - 1]
+        let current = this.state.current[this.state.current.length - 1]
         if (current) {
           if (c.pathname === current.pathname) {
             return
@@ -63,6 +62,9 @@ var PageSlider = {
       pages = this.state.pages,
       l = history.length,
       position = "center"
+    if (_.findIndex(pages, page) !== -1) {
+      return
+    }
     if (l === 0 && c != null) {
       history.push(c.pathname)
     } else if (c == null || c.action==="POP") {
@@ -72,9 +74,12 @@ var PageSlider = {
       history.push(c.pathname)
       position = "right"
     }
+    // remove unwanted page
+    if (pages.length > 1) {
+      pages.splice(0, 1)
+    }
     pages.push(React.cloneElement(page, {position}))
     this.setState({history: history, pages: pages, animating: position!=="center", current: this.state.current})
-
   },
   render() {
     return (
@@ -94,13 +99,12 @@ const IonView = React.createClass({
     history.unlisten(this.historyListener)
   },
   componentWillReceiveProps(nextProps) {
-    // if (this.props.children !== nextProps.children) {
     this.slidePage(nextProps.children, this.current)
-    this.current = null
-    // }
+    if (this.current !== undefined) {
+      this.current = null
+    }
   },
   historyListener(current) {
-    console.log("history")
     if (current.action !== "POP" || this.current === undefined) {
       this.current = current
     }
