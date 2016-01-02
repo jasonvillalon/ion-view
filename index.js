@@ -4,13 +4,30 @@ import dependencies from "./dependencies"
 import ReactDOM from "react-dom"
 import _ from "lodash"
 
-var PageSlider = {
+const IonView = React.createClass({
   getInitialState: function () {
     return {
       history: [],
       pages: [],
       animating: false,
       current: []
+    }
+  },
+  componentDidMount() {
+    history.listen(this.historyListener)
+  },
+  componentWillUnmount() {
+    history.unlisten(this.historyListener)
+  },
+  componentWillReceiveProps(nextProps) {
+    this.slidePage(nextProps.children, this.current)
+    if (this.current !== undefined) {
+      this.current = null
+    }
+  },
+  historyListener(current) {
+    if (current.action !== "POP" || this.current === undefined) {
+      this.current = current
     }
   },
   componentDidUpdate: function() {
@@ -50,6 +67,9 @@ var PageSlider = {
           }
         }
       }
+      // if (page.props.history === false) {
+      //   this.state.current.pop()
+      // }
       this.state.current.push(c)
     } else if (c == null || c.action==="POP") {
       if (this.state.current.length > 1) {
@@ -81,31 +101,10 @@ var PageSlider = {
   },
   render() {
     return (
-      <div className="pageslider-container">
+      <div className="ion-view">
         {this.state.pages}
       </div>
     )
-  }
-}
-
-const IonView = React.createClass({
-  mixins: [PageSlider],
-  componentDidMount() {
-    history.listen(this.historyListener)
-  },
-  componentWillUnmount() {
-    history.unlisten(this.historyListener)
-  },
-  componentWillReceiveProps(nextProps) {
-    this.slidePage(nextProps.children, this.current)
-    if (this.current !== undefined) {
-      this.current = null
-    }
-  },
-  historyListener(current) {
-    if (current.action !== "POP" || this.current === undefined) {
-      this.current = current
-    }
   }
 })
 
