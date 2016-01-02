@@ -1,8 +1,10 @@
 import React, {PropTypes} from "react"
-import history from "./../history"
-import dependencies from "./dependencies"
 import ReactDOM from "react-dom"
 import _ from "lodash"
+
+import dependencies from "./dependencies"
+
+let {History} = dependencies
 
 const IonView = React.createClass({
   getInitialState: function () {
@@ -14,10 +16,10 @@ const IonView = React.createClass({
     }
   },
   componentDidMount() {
-    history.listen(this.historyListener)
+    History.listen(this.historyListener)
   },
   componentWillUnmount() {
-    history.unlisten(this.historyListener)
+    History.unlisten(this.historyListener)
   },
   componentWillReceiveProps(nextProps) {
     this.slidePage(nextProps.children, this.current)
@@ -76,7 +78,7 @@ const IonView = React.createClass({
         this.state.current.pop()
       }
     }
-    var history = this.state.history,
+    let history = this.state.history,
       pages = this.state.pages,
       l = history.length,
       position = "center"
