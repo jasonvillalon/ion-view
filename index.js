@@ -85,6 +85,9 @@ const IonView = React.createClass({
     if (_.findIndex(pages, page) !== -1) {
       return
     }
+    // if (pages[pages.length - 1]) {
+    //   if (pages[pages.length - 1].type.displayName === page.type.displayName) return
+    // }
     if (l === 0 && c != null) {
       history.push(c.pathname)
     } else if (c == null || c.action==="POP") {
@@ -103,7 +106,7 @@ const IonView = React.createClass({
   },
   render() {
     return (
-      <div className="ion-view">
+      <div {...this.props} className="ion-view">
         {this.state.pages}
       </div>
     )
