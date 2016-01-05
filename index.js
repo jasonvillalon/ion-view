@@ -16,10 +16,11 @@ const IonView = React.createClass({
     }
   },
   componentDidMount() {
-    History.listen(this.historyListener)
+    this.History = History.listen(this.historyListener)
   },
   componentWillUnmount() {
-    History.unlisten(this.historyListener)
+    this.History()
+    this.unMount = true
   },
   componentWillReceiveProps(nextProps) {
     this.slidePage(nextProps.children, this.current)
@@ -28,6 +29,7 @@ const IonView = React.createClass({
     }
   },
   historyListener(current) {
+    if (this.unMount) return
     if (current.action !== "POP" || this.current === undefined) {
       this.current = current
     }
