@@ -4,10 +4,10 @@ import _ from "lodash"
 
 import dependencies from "./dependencies"
 
-let {History} = dependencies
+let {History, Card} = dependencies
 
 const IonView = React.createClass({
-  getInitialState: function () {
+  getInitialState() {
     return {
       history: [],
       pages: [],
@@ -16,10 +16,10 @@ const IonView = React.createClass({
     }
   },
   componentDidMount() {
-    this.History = History.listen(this.historyListener)
+    this.history = History.listen(this.historyListener)
   },
   componentWillUnmount() {
-    this.History()
+    this.history()
     this.unMount = true
   },
   componentWillReceiveProps(nextProps) {
@@ -75,7 +75,7 @@ const IonView = React.createClass({
       //   this.state.current.pop()
       // }
       this.state.current.push(c)
-    } else if (c == null || c.action==="POP") {
+    } else if (c == null || c.action === "POP") {
       if (this.state.current.length > 1) {
         this.state.current.pop()
       }
@@ -92,7 +92,7 @@ const IonView = React.createClass({
     // }
     if (l === 0 && c != null) {
       history.push(c.pathname)
-    } else if (c == null || c.action==="POP") {
+    } else if (c == null || c.action === "POP") {
       history.pop()
       position = "left"
     } else {
@@ -103,8 +103,8 @@ const IonView = React.createClass({
     if (pages.length > 1) {
       pages.splice(0, 1)
     }
-    pages.push(React.cloneElement(page, {position}))
-    this.setState({history: history, pages: pages, animating: position!=="center", current: this.state.current})
+    pages.push(<Card className="page" position={position}>{React.cloneElement(page)}</Card>)
+    this.setState({history: history, pages: pages, animating: position !== "center", current: this.state.current})
   },
   render() {
     return (

@@ -10,6 +10,12 @@ module.exports = {
       "JSPMDeps": {
         "npm:history": "^1.17.0"
       }
+    },
+    {
+      "Name": "Card",
+      "Description": "Card",
+      "Author": "Jason Villalon",
+      "Repository": "git@bitbucket.org:generator-react-component/card.git"
     }
   ],
   "JSPMDeps": {
